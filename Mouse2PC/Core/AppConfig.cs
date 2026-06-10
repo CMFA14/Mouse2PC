@@ -1,7 +1,7 @@
 using System.Text.Json;
-using MouseLink.Net;
+using Mouse2PC.Net;
 
-namespace MouseLink.Core;
+namespace Mouse2PC.Core;
 
 public class AppConfig
 {
@@ -30,7 +30,7 @@ public class AppConfig
         {
             var dir = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "MouseLink");
+                "Mouse2PC");
             Directory.CreateDirectory(dir);
             return Path.Combine(dir, "config.json");
         }

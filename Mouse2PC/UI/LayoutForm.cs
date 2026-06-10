@@ -1,6 +1,6 @@
-using MouseLink.Core;
+using Mouse2PC.Core;
 
-namespace MouseLink.UI;
+namespace Mouse2PC.UI;
 
 // Painel de configuração do layout: mostra todas as telas (deste PC e do
 // remoto) como retângulos arrastáveis. A posição relativa define por qual
@@ -19,7 +19,7 @@ public class LayoutForm : Form
         _config = config;
         _screens = VirtualLayout.Build(config, config.RemoteMonitorsCache).Screens;
 
-        Text = "MouseLink – Layout das telas";
+        Text = "Mouse2PC – Layout das telas";
         ClientSize = new Size(820, 560);
         MinimumSize = new Size(520, 400);
         DoubleBuffered = true;

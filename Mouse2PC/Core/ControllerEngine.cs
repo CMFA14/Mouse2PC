@@ -1,8 +1,8 @@
 using System.Net.Sockets;
-using MouseLink.Native;
-using MouseLink.Net;
+using Mouse2PC.Native;
+using Mouse2PC.Net;
 
-namespace MouseLink.Core;
+namespace Mouse2PC.Core;
 
 // Roda no PC que tem o mouse/teclado físico. Instala hooks de baixo nível;
 // quando o cursor cruza a borda para uma tela remota, passa a bloquear o

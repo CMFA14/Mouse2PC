@@ -1,6 +1,6 @@
-using MouseLink.UI;
+using Mouse2PC.UI;
 
-namespace MouseLink;
+namespace Mouse2PC;
 
 internal static class Program
 {

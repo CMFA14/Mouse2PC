@@ -1,6 +1,6 @@
-using MouseLink.Net;
+using Mouse2PC.Net;
 
-namespace MouseLink.Core;
+namespace Mouse2PC.Core;
 
 // Uma tela (local ou remota) posicionada no espaço virtual combinado.
 public class ScreenNode

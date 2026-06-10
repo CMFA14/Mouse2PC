@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace MouseLink.Net;
+namespace Mouse2PC.Net;
 
 // Mensagens trocadas como JSON, uma por linha, sobre TCP.
 // O controlador converte coordenadas virtuais para coordenadas físicas

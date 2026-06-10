@@ -6,8 +6,8 @@
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>MouseLink</AssemblyName>
-    <RootNamespace>MouseLink</RootNamespace>
+    <AssemblyName>Mouse2PC</AssemblyName>
+    <RootNamespace>Mouse2PC</RootNamespace>
   </PropertyGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace MouseLink.Native;
+namespace Mouse2PC.Native;
 
 internal static class NativeMethods
 {

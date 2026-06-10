@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Sockets;
-using MouseLink.Core;
+using Mouse2PC.Core;
 
-namespace MouseLink.UI;
+namespace Mouse2PC.UI;
 
 public class MainForm : Form
 {
@@ -24,7 +24,7 @@ public class MainForm : Form
 
     public MainForm()
     {
-        Text = "MouseLink";
+        Text = "Mouse2PC";
         ClientSize = new Size(460, 320);
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
@@ -126,7 +126,7 @@ public class MainForm : Form
         {
             if (string.IsNullOrWhiteSpace(_config.RemoteHost))
             {
-                MessageBox.Show(this, "Informe o IP do PC controlado.", "MouseLink",
+                MessageBox.Show(this, "Informe o IP do PC controlado.", "Mouse2PC",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -172,7 +172,7 @@ public class MainForm : Form
             MessageBox.Show(this,
                 "As telas do PC remoto ainda não são conhecidas.\n" +
                 "Inicie e conecte ao PC controlado ao menos uma vez; depois volte aqui.",
-                "MouseLink", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                "Mouse2PC", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 

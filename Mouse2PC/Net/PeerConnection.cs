@@ -2,7 +2,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Channels;
 
-namespace MouseLink.Net;
+namespace Mouse2PC.Net;
 
 // Envolve um TcpClient conectado: escrita enfileirada (para nunca bloquear o
 // hook de mouse) e leitura linha a linha em background.

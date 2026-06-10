@@ -1,9 +1,9 @@
 using System.Net;
 using System.Net.Sockets;
-using MouseLink.Native;
-using MouseLink.Net;
+using Mouse2PC.Native;
+using Mouse2PC.Net;
 
-namespace MouseLink.Core;
+namespace Mouse2PC.Core;
 
 // Roda no PC controlado: escuta na porta TCP, anuncia seus monitores e
 // injeta os eventos de mouse/teclado recebidos via SendInput.

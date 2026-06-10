@@ -1,4 +1,4 @@
-# MouseLink
+# Mouse2PC
 
 Um mouse e teclado controlando dois computadores Windows como se fossem um
 único desktop estendido — incluindo múltiplos monitores em cada PC — com um
@@ -6,7 +6,7 @@ painel visual para configurar onde cada tela fica.
 
 ## Como funciona
 
-- O mesmo `MouseLink.exe` roda nos dois PCs, em papéis diferentes:
+- O mesmo `Mouse2PC.exe` roda nos dois PCs, em papéis diferentes:
   - **Controlador**: o PC onde o mouse/teclado físicos estão conectados.
     Captura o input com hooks de baixo nível; quando o cursor cruza a borda
     para uma tela do outro PC, o input passa a ser enviado pela rede.
@@ -18,8 +18,8 @@ painel visual para configurar onde cada tela fica.
 
 ## Uso
 
-1. Compile: `dotnet publish MouseLink -c Release -r win-x64 --self-contained false`
-   (ou `dotnet build`) e copie o `MouseLink.exe` para os dois PCs.
+1. Compile: `dotnet publish Mouse2PC -c Release -r win-x64 --self-contained false`
+   (ou `dotnet build`) e copie o `Mouse2PC.exe` para os dois PCs.
 2. **No PC controlado**: abra o app, marque "Controlado", clique **Iniciar**.
    Anote o IP exibido. Libere a porta 24801 no Firewall do Windows
    (o Windows costuma perguntar na primeira execução — aceite em "Redes privadas").
