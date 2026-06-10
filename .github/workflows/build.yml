@@ -6,6 +6,9 @@ on:
     tags: ['v*']
   pull_request:
 
+permissions:
+  contents: write # necessário para o passo de Release criar/atualizar releases
+
 jobs:
   build:
     runs-on: windows-latest
