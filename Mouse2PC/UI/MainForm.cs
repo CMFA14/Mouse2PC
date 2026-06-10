@@ -6,6 +6,11 @@ namespace Mouse2PC.UI;
 
 public class MainForm : Form
 {
+    // Mesma paleta escura do painel de layout
+    private static readonly Color BackDark = Color.FromArgb(32, 32, 32);
+    private static readonly Color CardBack = Color.FromArgb(43, 43, 43);
+    private static readonly Color TextDim = Color.FromArgb(170, 170, 170);
+
     private readonly AppConfig _config = AppConfig.Load();
 
     private ControllerEngine? _engine;
@@ -25,57 +30,82 @@ public class MainForm : Form
     public MainForm()
     {
         Text = "Mouse2PC";
-        ClientSize = new Size(460, 320);
+        ClientSize = new Size(480, 360);
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
+        BackColor = BackDark;
+        ForeColor = Color.White;
+        Font = new Font("Segoe UI", 9.75f);
 
-        var lblMode = new Label { Text = "Papel deste computador:", Left = 20, Top = 18, AutoSize = true };
+        var lblTitle = new Label
+        {
+            Text = "Mouse2PC",
+            Font = new Font("Segoe UI Semibold", 15f),
+            AutoSize = true,
+            Location = new Point(20, 14),
+        };
+
+        var lblMode = new Label
+        {
+            Text = "Papel deste computador",
+            ForeColor = TextDim,
+            Left = 20, Top = 52, AutoSize = true,
+        };
 
         _rbController = new RadioButton
         {
             Text = "Controlador — o mouse e o teclado físicos estão aqui",
-            Left = 30, Top = 42, AutoSize = true,
+            Left = 28, Top = 76, AutoSize = true,
         };
         _rbControlled = new RadioButton
         {
             Text = "Controlado — recebe o mouse vindo do outro PC",
-            Left = 30, Top = 66, AutoSize = true,
+            Left = 28, Top = 102, AutoSize = true,
         };
 
-        var lblHost = new Label { Text = "IP do PC controlado:", Left = 20, Top = 104, AutoSize = true };
-        _txtHost = new TextBox { Left = 150, Top = 100, Width = 160 };
+        var lblHost = new Label { Text = "IP do PC controlado:", Left = 20, Top = 142, AutoSize = true };
+        _txtHost = new TextBox
+        {
+            Left = 160, Top = 138, Width = 160,
+            BackColor = CardBack, ForeColor = Color.White,
+            BorderStyle = BorderStyle.FixedSingle,
+        };
 
-        var lblPort = new Label { Text = "Porta:", Left = 325, Top = 104, AutoSize = true };
+        var lblPort = new Label { Text = "Porta:", Left = 335, Top = 142, AutoSize = true };
         _numPort = new NumericUpDown
         {
-            Left = 370, Top = 100, Width = 70,
+            Left = 385, Top = 138, Width = 75,
             Minimum = 1024, Maximum = 65535, Value = 24801,
+            BackColor = CardBack, ForeColor = Color.White,
+            BorderStyle = BorderStyle.FixedSingle,
         };
 
         _lblLocalIps = new Label
         {
-            Left = 20, Top = 132, Width = 420, Height = 18,
-            ForeColor = Color.DimGray,
+            Left = 20, Top = 172, Width = 440, Height = 20,
+            ForeColor = TextDim,
         };
 
-        _btnStartStop = new Button { Text = "Iniciar", Left = 20, Top = 162, Width = 200, Height = 36 };
+        _btnStartStop = MakeButton("Iniciar", accent: true);
+        _btnStartStop.Location = new Point(20, 202);
         _btnStartStop.Click += (_, _) => ToggleStartStop();
 
-        _btnLayout = new Button { Text = "Configurar telas...", Left = 240, Top = 162, Width = 200, Height = 36 };
+        _btnLayout = MakeButton("Configurar telas...", accent: false);
+        _btnLayout.Location = new Point(250, 202);
         _btnLayout.Click += (_, _) => OpenLayout();
 
         _lblStatus = new Label
         {
-            Left = 20, Top = 216, Width = 420, Height = 80,
-            BorderStyle = BorderStyle.FixedSingle,
+            Left = 20, Top = 256, Width = 440, Height = 84,
+            BackColor = CardBack,
             TextAlign = ContentAlignment.MiddleLeft,
-            Padding = new Padding(8),
+            Padding = new Padding(12, 0, 12, 0),
             Text = "Parado.",
         };
 
         Controls.AddRange(new Control[]
         {
-            lblMode, _rbController, _rbControlled,
+            lblTitle, lblMode, _rbController, _rbControlled,
             lblHost, _txtHost, lblPort, _numPort,
             _lblLocalIps, _btnStartStop, _btnLayout, _lblStatus,
         });
@@ -89,6 +119,21 @@ public class MainForm : Form
         _rbController.CheckedChanged += (_, _) => UpdateUiForMode();
         UpdateUiForMode();
         FormClosing += (_, _) => StopAll();
+    }
+
+    private static Button MakeButton(string text, bool accent)
+    {
+        var b = new Button
+        {
+            Text = text,
+            Size = new Size(210, 38),
+            FlatStyle = FlatStyle.Flat,
+            ForeColor = Color.White,
+            BackColor = accent ? Color.FromArgb(0, 110, 200) : Color.FromArgb(55, 55, 55),
+        };
+        b.FlatAppearance.BorderColor = Color.FromArgb(80, 80, 80);
+        b.FlatAppearance.BorderSize = accent ? 0 : 1;
+        return b;
     }
 
     private void UpdateUiForMode()
@@ -138,6 +183,7 @@ public class MainForm : Form
         {
             _endpoint = new ControlledEndpoint(_config.Port);
             _endpoint.StatusChanged += s => BeginInvoke(() => SetStatus(s));
+            _endpoint.IdentifyRequested += nums => BeginInvoke(() => ShowIdentify(nums));
             _endpoint.Start();
         }
 
@@ -146,6 +192,16 @@ public class MainForm : Form
         _rbController.Enabled = _rbControlled.Enabled = false;
         _numPort.Enabled = false;
         UpdateUiForMode();
+    }
+
+    // O controlador pediu "Identificar": pisca o número em cada tela deste PC
+    // (mesma ordem de monitores enviada no hello).
+    private void ShowIdentify(int[] numbers)
+    {
+        var screens = Screen.AllScreens
+            .OrderBy(s => s.Bounds.X).ThenBy(s => s.Bounds.Y)
+            .Select((s, i) => (s.Bounds, i < numbers.Length ? numbers[i] : i + 1));
+        IdentifyOverlay.ShowNumbers(screens);
     }
 
     private void StopAll()
@@ -176,7 +232,7 @@ public class MainForm : Form
             return;
         }
 
-        using var form = new LayoutForm(_config);
+        using var form = new LayoutForm(_config, _engine);
         if (form.ShowDialog(this) == DialogResult.OK)
             _engine?.ReloadLayout();
     }

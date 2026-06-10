@@ -53,6 +53,11 @@ public class ControllerEngine : IDisposable
         _ = ConnectLoop(_connectCts.Token);
     }
 
+    // Pede ao PC controlado que pisque o número de cada tela dele
+    // (posição i do array = índice do monitor remoto, valor = número).
+    public void SendIdentify(int[] numbersByRemoteIndex) =>
+        _conn?.Send(new Msg { Type = Msg.Ident, Numbers = numbersByRemoteIndex });
+
     // Reconstroi o layout (chamado após salvar no painel de configuração).
     public void ReloadLayout()
     {

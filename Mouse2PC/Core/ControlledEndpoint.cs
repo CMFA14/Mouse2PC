@@ -16,6 +16,9 @@ public class ControlledEndpoint : IDisposable
     private readonly HashSet<int> _injectedHeldKeys = new();
 
     public event Action<string>? StatusChanged;
+    // Disparado quando o controlador pede "Identificar": posição i do array
+    // é o índice do monitor (mesma ordem do hello), valor é o número a piscar.
+    public event Action<int[]>? IdentifyRequested;
 
     public ControlledEndpoint(int port) => _port = port;
 
@@ -80,6 +83,9 @@ public class ControlledEndpoint : IDisposable
             case Msg.Wheel: InjectWheel(msg.WheelV, msg.WheelH); break;
             case Msg.Key: InjectKey(msg.Vk, msg.Scan, msg.Extended, msg.Down); break;
             case Msg.Leave: ReleaseHeldKeys(); break;
+            case Msg.Ident when msg.Numbers != null:
+                IdentifyRequested?.Invoke(msg.Numbers);
+                break;
         }
     }
 

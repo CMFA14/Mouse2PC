@@ -32,6 +32,9 @@ public class Msg
     [JsonPropertyName("sc")] public int Scan { get; set; }
     [JsonPropertyName("ext")] public bool Extended { get; set; }
 
+    // ident: posição i = índice do monitor remoto, valor = número a exibir
+    [JsonPropertyName("nums")] public int[]? Numbers { get; set; }
+
     public const string Hello = "hello";
     public const string Move = "move";
     public const string Btn = "btn";
@@ -39,6 +42,8 @@ public class Msg
     public const string Key = "key";
     // enviado quando o cursor sai das telas remotas, para soltar teclas presas
     public const string Leave = "leave";
+    // pisca o número de cada tela no PC controlado (botão "Identificar")
+    public const string Ident = "ident";
 
     private static readonly JsonSerializerOptions Options = new()
     {
