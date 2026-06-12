@@ -51,7 +51,20 @@ public class ControllerEngine : IDisposable
 
         _connectCts = new CancellationTokenSource();
         _ = ConnectLoop(_connectCts.Token);
+
+        // Monitores locais mudaram (conectado/desconectado/resolução):
+        // reconstrói o layout com a configuração atual.
+        Microsoft.Win32.SystemEvents.DisplaySettingsChanged += OnDisplayChanged;
     }
+
+    private void OnDisplayChanged(object? sender, EventArgs e) => Post(() =>
+    {
+        if (_layout == null) return;
+        if (_remoteActive) ReturnToLocal(force: true); // telas mudaram sob o cursor
+        ReloadLayout();
+        StatusChanged?.Invoke($"Telas locais alteradas ({Screen.AllScreens.Length} monitor(es)) — layout atualizado.");
+        RemoteInfoReceived?.Invoke();
+    });
 
     // Pede ao PC controlado que pisque o número de cada tela dele
     // (posição i do array = índice do monitor remoto, valor = número).
@@ -105,6 +118,9 @@ public class ControllerEngine : IDisposable
     {
         if (msg.Type == Msg.Hello && msg.Monitors != null)
         {
+            // Um hello no meio da sessão significa que as telas remotas
+            // mudaram; volta o cursor para cá antes de trocar o layout.
+            if (_remoteActive) ReturnToLocal(force: true);
             _config.RemoteMonitorsCache = msg.Monitors;
             _config.RemoteName = msg.MachineName ?? "Remoto";
             _config.Save();
@@ -325,6 +341,7 @@ public class ControllerEngine : IDisposable
 
     public void Dispose()
     {
+        Microsoft.Win32.SystemEvents.DisplaySettingsChanged -= OnDisplayChanged;
         if (_remoteActive) ReturnToLocal(force: true);
         _connectCts?.Cancel();
         _conn?.Dispose();

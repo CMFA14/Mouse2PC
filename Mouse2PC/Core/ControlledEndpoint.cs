@@ -27,7 +27,17 @@ public class ControlledEndpoint : IDisposable
         _listener = new TcpListener(IPAddress.Any, _port);
         _listener.Start();
         _ = AcceptLoop();
+        // Monitor conectado/desconectado ou resolução alterada: reanuncia as
+        // telas ao controlador, que reconstrói o layout.
+        Microsoft.Win32.SystemEvents.DisplaySettingsChanged += OnDisplayChanged;
         StatusChanged?.Invoke($"Aguardando conexão na porta {_port}...");
+    }
+
+    private void OnDisplayChanged(object? sender, EventArgs e)
+    {
+        if (_conn == null) return;
+        _conn.Send(BuildHello());
+        StatusChanged?.Invoke($"Telas alteradas ({Screen.AllScreens.Length} monitor(es)) — controlador atualizado.");
     }
 
     private async Task AcceptLoop()
@@ -211,6 +221,7 @@ public class ControlledEndpoint : IDisposable
 
     public void Dispose()
     {
+        Microsoft.Win32.SystemEvents.DisplaySettingsChanged -= OnDisplayChanged;
         _cts.Cancel();
         ReleaseHeldKeys();
         _conn?.Dispose();
