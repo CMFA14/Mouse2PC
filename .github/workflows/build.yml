@@ -7,7 +7,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write # necessário para o passo de Release criar/atualizar releases
+  contents: write # necessário para criar/atualizar releases
 
 jobs:
   build:
@@ -26,18 +26,39 @@ jobs:
         run: >
           dotnet publish Mouse2PC/Mouse2PC.csproj -c Release -r win-x64
           --self-contained true -p:PublishSingleFile=true
-          -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+          -p:IncludeNativeLibrariesForSelfExtract=true -o publish-single
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: Mouse2PC
-          path: publish/Mouse2PC.exe
+          path: publish-single/Mouse2PC.exe
 
-      # Em tags v* (ex.: v1.0.0), anexa o exe a um Release.
-      - name: Release
+      # ----------------------------------------------------------------
+      # Em tags v* (ex.: v1.1.0): empacota com Velopack e publica o
+      # Release com Setup.exe + pacotes de auto-update.
+
+      - name: Versão da tag
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: publish/Mouse2PC.exe
-          generate_release_notes: true
+        id: ver
+        shell: pwsh
+        run: '"version=$($env:GITHUB_REF_NAME.TrimStart(''v''))" >> $env:GITHUB_OUTPUT'
+
+      # Velopack precisa da pasta publicada completa (sem single-file).
+      - name: Publish para empacotamento
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: >
+          dotnet publish Mouse2PC/Mouse2PC.csproj -c Release -r win-x64
+          --self-contained true -p:Version=${{ steps.ver.outputs.version }}
+          -o publish-vpk
+
+      - name: Empacota e publica Release (Velopack)
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          dotnet tool install -g vpk
+          vpk pack -u Mouse2PC -v ${{ steps.ver.outputs.version }} `
+            -p publish-vpk -e Mouse2PC.exe --packTitle Mouse2PC
+          vpk upload github --repoUrl https://github.com/${{ github.repository }} `
+            --publish --releaseName "Mouse2PC ${{ github.ref_name }}" `
+            --tag ${{ github.ref_name }} --token ${{ secrets.GITHUB_TOKEN }}

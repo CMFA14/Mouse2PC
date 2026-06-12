@@ -120,6 +120,7 @@ public class MainForm : Form
         _rbController.CheckedChanged += (_, _) => UpdateUiForMode();
         UpdateUiForMode();
         FormClosing += (_, _) => StopAll();
+        Shown += async (_, _) => await UpdateService.CheckAndPromptAsync(this);
     }
 
     private static Button MakeButton(string text, bool accent)

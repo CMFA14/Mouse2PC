@@ -15,11 +15,15 @@ painel visual para configurar onde cada tela fica.
 - O **painel "Configurar telas..."** mostra todas as telas dos dois PCs como
   retângulos arrastáveis. As bordas encostadas definem por onde o cursor
   atravessa (direita, esquerda, cima ou baixo).
+- **Área de transferência compartilhada**: texto copiado (Ctrl+C) em um PC
+  pode ser colado (Ctrl+V) no outro, nas duas direções.
 
 ## Uso
 
-1. Compile: `dotnet publish Mouse2PC -c Release -r win-x64 --self-contained false`
-   (ou `dotnet build`) e copie o `Mouse2PC.exe` para os dois PCs.
+1. Baixe o **Mouse2PC-win-Setup.exe** do [Release mais recente](https://github.com/CMFA14/Mouse2PC/releases/latest)
+   e instale nos dois PCs. Instalado assim, o app **se atualiza sozinho**
+   quando sai versão nova. (Alternativa sem instalação: o pacote
+   `-Portable.zip` do mesmo Release, mas sem auto-update.)
 2. **No PC controlado**: abra o app, marque "Controlado", clique **Iniciar**.
    Anote o IP exibido. Libere a porta 24801 no Firewall do Windows
    (o Windows costuma perguntar na primeira execução — aceite em "Redes privadas").
