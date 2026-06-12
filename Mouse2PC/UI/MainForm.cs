@@ -15,6 +15,7 @@ public class MainForm : Form
 
     private ControllerEngine? _engine;
     private ControlledEndpoint? _endpoint;
+    private ClipboardSync? _clipboard;
 
     private readonly RadioButton _rbController;
     private readonly RadioButton _rbControlled;
@@ -167,16 +168,22 @@ public class MainForm : Form
         _config.Port = (int)_numPort.Value;
         _config.Save();
 
+        _clipboard = new ClipboardSync();
+
         if (_config.Mode == "controller")
         {
             if (string.IsNullOrWhiteSpace(_config.RemoteHost))
             {
                 MessageBox.Show(this, "Informe o IP do PC controlado.", "Mouse2PC",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                _clipboard.Dispose();
+                _clipboard = null;
                 return;
             }
             _engine = new ControllerEngine(_config);
             _engine.StatusChanged += SetStatus; // engine posta na thread de UI
+            _clipboard.LocalCopy += text => _engine?.SendClipboard(text);
+            _engine.ClipboardReceived += text => _clipboard?.SetFromRemote(text);
             _engine.Start();
         }
         else
@@ -184,6 +191,8 @@ public class MainForm : Form
             _endpoint = new ControlledEndpoint(_config.Port);
             _endpoint.StatusChanged += s => BeginInvoke(() => SetStatus(s));
             _endpoint.IdentifyRequested += nums => BeginInvoke(() => ShowIdentify(nums));
+            _clipboard.LocalCopy += text => _endpoint?.SendClipboard(text);
+            _endpoint.ClipboardReceived += text => BeginInvoke(() => _clipboard?.SetFromRemote(text));
             _endpoint.Start();
         }
 
@@ -210,6 +219,8 @@ public class MainForm : Form
         _engine = null;
         _endpoint?.Dispose();
         _endpoint = null;
+        _clipboard?.Dispose();
+        _clipboard = null;
 
         _running = false;
         _btnStartStop.Text = "Iniciar";

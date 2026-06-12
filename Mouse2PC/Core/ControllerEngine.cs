@@ -33,6 +33,8 @@ public class ControllerEngine : IDisposable
 
     public event Action<string>? StatusChanged;
     public event Action? RemoteInfoReceived;
+    // Texto copiado no PC remoto (aplicar ao clipboard local).
+    public event Action<string>? ClipboardReceived;
 
     public bool IsConnected => _conn != null && _layout != null;
 
@@ -70,6 +72,10 @@ public class ControllerEngine : IDisposable
     // (posição i do array = índice do monitor remoto, valor = número).
     public void SendIdentify(int[] numbersByRemoteIndex) =>
         _conn?.Send(new Msg { Type = Msg.Ident, Numbers = numbersByRemoteIndex });
+
+    // Texto copiado neste PC (replicar no clipboard remoto).
+    public void SendClipboard(string text) =>
+        _conn?.Send(new Msg { Type = Msg.Clip, Text = text });
 
     // Reconstroi o layout (chamado após salvar no painel de configuração).
     public void ReloadLayout()
@@ -128,6 +134,10 @@ public class ControllerEngine : IDisposable
             StatusChanged?.Invoke($"Conectado a {_config.RemoteName} " +
                 $"({msg.Monitors.Count} tela(s) remota(s)). Mova o mouse até a borda para atravessar.");
             RemoteInfoReceived?.Invoke();
+        }
+        else if (msg.Type == Msg.Clip && msg.Text != null)
+        {
+            ClipboardReceived?.Invoke(msg.Text);
         }
     }
 

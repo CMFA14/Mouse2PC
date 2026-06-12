@@ -19,6 +19,8 @@ public class ControlledEndpoint : IDisposable
     // Disparado quando o controlador pede "Identificar": posição i do array
     // é o índice do monitor (mesma ordem do hello), valor é o número a piscar.
     public event Action<int[]>? IdentifyRequested;
+    // Texto copiado no PC controlador (aplicar ao clipboard local).
+    public event Action<string>? ClipboardReceived;
 
     public ControlledEndpoint(int port) => _port = port;
 
@@ -96,8 +98,15 @@ public class ControlledEndpoint : IDisposable
             case Msg.Ident when msg.Numbers != null:
                 IdentifyRequested?.Invoke(msg.Numbers);
                 break;
+            case Msg.Clip when msg.Text != null:
+                ClipboardReceived?.Invoke(msg.Text);
+                break;
         }
     }
+
+    // Texto copiado neste PC (replicar no clipboard do controlador).
+    public void SendClipboard(string text) =>
+        _conn?.Send(new Msg { Type = Msg.Clip, Text = text });
 
     // ------------------------------------------------------------------
     // Injeção
